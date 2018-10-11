@@ -15,7 +15,37 @@ class Note extends Component {
         this.remove = this.remove.bind(this);
         this.renderForm = this.renderForm.bind(this);
         this.renderDisplay = this.renderDisplay.bind(this);
+        this.randomBetween = this.randomBetween.bind(this);
     }
+
+    componentWillMount() {
+        this.style = {
+            right: this.randomBetween(0, window.innerWidth - 150, 'px'),
+            top: this.randomBetween(0, window.innerWidth - 150, 'px'),
+            transform: `rotate(${this.randomBetween(-25, 25, 'deg')})`
+        }
+    }
+
+    randomBetween(x, y, s) {
+        return x + Math.ceil(Math.random() * (y - x)) + s
+    }
+
+    componentDidUpdate() {
+        var textarea
+        if (this.state.editing) {
+            textarea = this._newText
+            textarea.focus()
+            textarea.select()
+        }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return (
+            this.props.children !== nextProps.children || this.state !== nextState
+        )
+
+    }
+
     edit() {
         this.setState({
             editing: true
@@ -36,9 +66,9 @@ class Note extends Component {
 
     renderForm() {
         return (
-            <div className="note">
+            <div className="note" style={this.style}>
                 <form onSubmit={this.save}>
-                    <textarea ref={input => this._newText = input} />
+                    <textarea ref={input => this._newText = input} defaultValue={this.props.children} />
                     <button id="save"><FaSave /></button>
                 </form>
             </div>
@@ -47,7 +77,7 @@ class Note extends Component {
 
     renderDisplay() {
         return (
-            <div className="note">
+            <div className="note" style={this.style}>
                 <p>{this.props.children}</p>
                 <span>
                     <button onClick={this.edit} id="edit"><FaPencilAlt /></button>
